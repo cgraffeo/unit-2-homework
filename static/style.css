@@ -3,3 +3,16 @@
   color: 888;
   margin: 0;
 }
+.signup{
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+}
+.form-group{
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.error{
+  color: red;
+}
