@@ -16,3 +16,7 @@
 .error{
   color: red;
 }
+.content-subject{
+  font-size: 30px;
+  font-weight: bold;
+}
