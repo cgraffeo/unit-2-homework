@@ -4,6 +4,8 @@ import re
 import jinja2
 import webapp2
 
+from google.appengine.ext import db
+
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(
   loader=jinja2.FileSystemLoader(template_dir), autoescape=True)
@@ -139,10 +141,54 @@ class Welcome(Handler):
 #         username = self.request.cookies.get('username')
 #         self.render('welcome.html', username=username)
 
+class Content(db.Model):
+    subject = db.StringProperty(required=True)
+    content = db.TextProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
+
+
+class NewPost (Handler):
+    def render_front(self, subject="", content="", error=""):
+        contents = db.GqlQuery("SELECT * FROM Content "
+                               "ORDER BY created DESC ")
+
+        self.render("newpost.html", subject=subject, content=content,
+                    error=error, contents=contents)
+
+    def get(self):
+        self.render_front()
+
+    def post(self):
+        subject = self.request.get('subject')
+        content = self.request.get('content')
+
+        if subject and content:
+            c = Content(subject=subject, content=content)
+            c.put()
+
+            self.redirect('/blog')
+        else:
+            error = "We need both a subject and some content!"
+            self.render_front(subject, content, error)
+
+
+class Blog (Handler):
+    def render_blog(self, subject="", content="", error=""):
+        contents = db.GqlQuery("SELECT * FROM Content "
+                               "ORDER BY created DESC ")
+
+        self.render("blog.html", subject=subject, content=content,
+                    error=error, contents=contents)
+
+    def get(self):
+        self.render_blog()
+
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/fizzbuzz', FizzBuzzHandler),
     ('/rot13', Rot),
     ('/signup', Signup),
-    ('/welcome', Welcome)
+    ('/welcome', Welcome),
+    ('/blog/newpost', NewPost),
+    ('/blog', Blog)
 ], debug=True)

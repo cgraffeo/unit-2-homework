@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+  {% block content %}
+  {% for content in contents %}
+    <div class="content">
+      <hr>
+      <div class="content-subject">{{content.subject}}</div>
+      <div class="content-body">{{content.content}}</div>
+    </div>
+  {% endfor %}
+{% endblock %}
